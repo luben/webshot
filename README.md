@@ -1,7 +1,7 @@
 webshot
 =======
 
-Utility to create screenshota and thumbnails of web pages
+Utility to create screenshots and thumbnails of web pages
 
 Usage 
 -----
