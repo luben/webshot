@@ -6,26 +6,27 @@ Utility to create screenshots and thumbnails of web pages
 Usage 
 -----
 
-webshot [options] URI [out.png]
+    webshot [options] URI [out.png]
 
-Options: 
-    -h|--height     Height of the browser windown. If not specified
-                    the window will be resized in order for HTML
-                    document to fit inside
+    Options: 
 
-    -w|--width      Width of the window
+        -h|--height     Height of the browser windown. If not specified
+                        the window will be resized in order for HTML
+                        document to fit inside
 
-    -s|--scale      If specified the resulting image will be scaled
-                    to have this width, aspect ratio will be preserved
-                    (Image::Magick is required)
+        -w|--width      Width of the window
 
-    -t|--thumb      Filename to save scaled image. If not specified the 
-                    output will be replaced
+        -s|--scale      If specified the resulting image will be scaled
+                        to have this width, aspect ratio will be preserved
+                        (Image::Magick is required)
 
-    -v|--verbose    Print error messages from the browser while 
-                    processing the page
+        -t|--thumb      Filename to save scaled image. If not specified the 
+                        output will be replaced
 
-    --help          This help
+        -v|--verbose    Print error messages from the browser while 
+                        processing the page
+
+        --help          This help
 
 
 Dependencies
