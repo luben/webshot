@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+use common::sense;
+use Gtk3 -init;
+use Gtk3::WebKit;
+use List::Util 'max';
+use Getopt::Long;
+
+sub usage {
+    print <<END;
+
+Usage: webshot [options] URI [out.png]
+
+Options: 
+    -h|--height     Height of the browser windown. If not specified
+                    the window will be resized in order for HTML
+                    document to fit inside
+
+    -w|--width      Width of the window
+
+    -s|--scale      If specified the resulting image will be scaled
+                    to have this width, aspect ratio will be preserved
+                    (Image::Magick is required)
+
+    -t|--thumb      Filename to save scaled image. If not specified the 
+                    output will be replaced
+
+    -v|--verbose    Print error messages from the browser while 
+                    processing the page
+
+    --help          This help
+
+END
+    exit(0);
+}
+
+my ($width, $height,$width,$scale,$thumb,$verbose);
+GetOptions(
+    'height=i'=> \$height,
+    'width=i' => \$width,
+    'scale=i' => \$scale,
+    'thumb=s' => \$thumb,
+    'verbose!'=> \$verbose,
+    'help'    => \&usahe
+);
+
+my $url = shift @ARGV || usage();
+my $out = shift @ARGV || 'out.png';
+
+unless ($verbose){
+    open STDERR, '>', '/dev/null';
+}
+
+my $window = Gtk3::OffscreenWindow->new('toplevel');
+
+$window->set_default_size($width||1024, $height||768);
+$window->signal_connect(destroy => sub { Gtk3->main_quit() });
+
+# Create a WebKit widget
+my $view = Gtk3::WebKit::WebView->new();
+
+# Load a page
+$view->load_uri($url);
+
+# Pack the widgets together
+my $scrolls = Gtk3::ScrolledWindow->new();
+$scrolls->add($view);
+$window->add($scrolls);
+$window->show_all();
+
+# load and draw
+Gtk3->main_iteration while Gtk3->events_pending or $view->get_load_status ne 'finished';
+
+unless ($height) {
+    # find content height
+    my $html = $view->get_dom_document->get_document_element; 
+    $height = max( $html->get_client_height, $html->get_scroll_height, $html->get_offset_height );
+
+    # resize window
+    $window->set_default_size($width||1024, $height);
+    Gtk3->main_iteration while Gtk3->events_pending;
+}
+
+$window->get_surface()->write_to_png($out);
+if ($scale) {
+    require Image::Magick;
+    my $img = new Image::Magick;
+    $width ||= 1024;
+    $height *= $scale/$width;
+    $width = $scale;
+    
+    $img->Read($out);
+
+    $img->Resize(
+        width   => $width,
+        height  => $height,
+        filter  => 'Lagrange'
+    );
+    $img->Set( density => $width.'x'.$height );
+    $img->Set( quality => '85' );
+    $img->Write( filename => ($thumb||$out));
+}
+
