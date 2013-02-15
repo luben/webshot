@@ -33,14 +33,14 @@ END
     exit(0);
 }
 
-my ($width, $height,$width,$scale,$thumb,$verbose);
+my ($height,$width,$scale,$thumb,$verbose);
 GetOptions(
     'height=i'=> \$height,
     'width=i' => \$width,
     'scale=i' => \$scale,
     'thumb=s' => \$thumb,
     'verbose!'=> \$verbose,
-    'help'    => \&usahe
+    'help'    => \&usage
 );
 
 my $url = shift @ARGV || usage();
